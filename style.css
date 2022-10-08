@@ -1,5 +1,10 @@
 body {
-  background: linear-gradient(to bottom, red, green, blue);
+  background: linear-gradient(
+    to bottom,
+    rgb(17, 17, 17),
+    rgb(46, 46, 46),
+    rgb(17, 17, 17)
+  );
 
   width: 100vw;
   height: 100vh;

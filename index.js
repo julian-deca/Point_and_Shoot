@@ -50,6 +50,7 @@ class Raven {
       "," +
       this.randomColor[2] +
       ")";
+    this.hasOwnTrail = Math.random() > 0.5;
   }
   update(deltatime) {
     if (this.y < 0 || this.y > HEIGHT - this.height) {
@@ -64,7 +65,11 @@ class Raven {
       if (this.frame > this.maxFrame) this.frame = 0;
       else this.frame++;
       this.timeSinceFlap = 0;
-      particles.push(new Particle(this.x, this.y, this.width, this.color));
+      if (this.hasOwnTrail) {
+        //for (let i = 0; i < 5; i++) { way too laggy
+        particles.push(new Particle(this.x, this.y, this.width, this.color));
+        // }
+      }
     }
     if (this.x < 0 - this.width) gameOver = true;
   }
@@ -131,8 +136,8 @@ let particles = [];
 class Particle {
   constructor(x, y, size, color) {
     this.size = size;
-    this.x = x + this.size / 2;
-    this.y = y + this.size / 3;
+    this.x = x + this.size / 2 + Math.random() * 50 - 25;
+    this.y = y + this.size / 3 + Math.random() * 50 - 25;
     this.radious = (Math.random() * this.size) / 10;
     this.maxRadious = Math.random() * 20 + 35;
     this.markedForDeletion = false;
@@ -141,14 +146,17 @@ class Particle {
   }
   update() {
     this.x += this.speedX;
-    this.radious += 0.2;
-    if (this.radious > this.maxRadious) this.markedForDeletion = true;
+    this.radious += 0.3;
+    if (this.radious > this.maxRadious - 5) this.markedForDeletion = true;
   }
   draw() {
+    ctx.save();
+    ctx.globalAlpha = 1 - this.radious / this.maxRadious;
     ctx.beginPath();
     ctx.fillStyle = this.color;
     ctx.arc(this.x, this.y, this.radious, 0, Math.PI * 2);
     ctx.fill();
+    ctx.restore();
   }
 }
 
@@ -207,6 +215,7 @@ function animate(timestamp) {
   [...particles, ...ravens, ...explosions].forEach((object) => object.draw());
   ravens = ravens.filter((obj) => !obj.markedForDeletion);
   explosions = explosions.filter((obj) => !obj.markedForDeletion);
+  particles = particles.filter((obj) => !obj.markedForDeletion);
 
   if (!gameOver) requestAnimationFrame(animate);
   else drawGameOver();
